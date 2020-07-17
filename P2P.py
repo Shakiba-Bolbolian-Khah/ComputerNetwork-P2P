@@ -3,7 +3,7 @@ import threading
 import time
 import schedule 
 import random
-
+import json
 
 ports = [20001,20002,20003,20004,20005,20006]
 nodes = []
@@ -14,9 +14,13 @@ class NodeInfo:
         self.ip = ip
         self.port = port
         self.lastHearedTime = datetime.now()
+        self.lastSentTime = None
         self.id = id
-    def updateTimeToCurrentTime(self):
+    def updateHearedTimeToCurrentTime(self):
         self.lastHearedTime = datetime.now()
+        
+    def updateSentTimeToCurrentTime(self):
+        self.lastSentTime = datetime.now()
 
 
 class Node:
@@ -34,8 +38,22 @@ class Node:
 
         schedule.every(2).seconds.do(runThread, self.manageSend)
 
-    def manageSend(self):
+    def createPacket(self):
+        packet = {}
+        packet['id'] = self.id
+        packet['ip'] = self.ip
+        packet['port'] = self.port
+        packet['type'] = 'UDP'
+        packet['neighbors'] = list(self.getIdList(self.biNeighbors))
+        return packet
 
+    def manageSend(self):
+        self.checkNeighbors()
+        packet = self.createPacket()
+        for n in self.biNeighbors + self.uniNeighbors + self.tempNeighbors:
+            packet['last heared'] = n.lastHearedTime
+            packet['last sent'] = n.lastSentTime
+            s.sendto(json.dumps(packet), (n.ip, n.port))
 
 
     def recv(self):
@@ -99,7 +117,7 @@ class Node:
         isInPacket = extractNode(packet)
         sender = extranceSender(packet)
         self.checkNeighbors()
-        
+
         node = existsInList(sender, self.tempNeighbors)
         if node 
             if isInPacket:
@@ -109,7 +127,7 @@ class Node:
             else:
                 self.removeFromTemp(node)
                 self.addToBi(node)
-            node.updateTimeToCurrentTime()
+            node.updateHearedTimeToCurrentTime()
             return
 
         node = existsInList(sender, self.uniNeighbors)
@@ -117,13 +135,13 @@ class Node:
             if isInPacket:
                 self.removeFromUni(node)
                 self.addToUni(node)
-            node.updateTimeToCurrentTime()
+            node.updateHearedTimeToCurrentTime()
             # Nothing to do if it is in uni and not in packet
             return
 
         node = existsInList(sender, self.biNeighbors)
         if node:
-            node.updateTimeToCurrentTime()
+            node.updateHearedTimeToCurrentTime()
         else:
             newNodeInfo = NodeInfo(nodes[sender].ip, nodes[sender].port, sender)
             if isInPacket:
@@ -148,7 +166,6 @@ class Node:
             newNodeInfo = NodeInfo(nodes[newNode].ip,nodes[newNode].port, newNode)
             self.addToTemp(newNodeInfo)
     
-
 
 class Network:
     def __init__(self):
