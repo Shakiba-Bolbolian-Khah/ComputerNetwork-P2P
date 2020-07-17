@@ -4,6 +4,8 @@ import time
 import schedule 
 import random
 import json
+from socket import *
+from threading import *
 
 ports = [20001,20002,20003,20004,20005,20006]
 nodes = []
@@ -53,12 +55,12 @@ class Node:
         for n in self.biNeighbors + self.uniNeighbors + self.tempNeighbors:
             packet['last heared'] = n.lastHearedTime
             packet['last sent'] = n.lastSentTime
-            s.sendto(json.dumps(packet), (n.ip, n.port))
+            self.sock.sendto(json.dumps(packet), (n.ip, n.port))
 
 
     def recv(self):
         while True:
-            data, address = s.recvfrom(1024)
+            data, address = self.sock.recvfrom(1024)
             print(data)
             self.processPacket(data)
 
@@ -115,11 +117,11 @@ class Node:
             return
 
         isInPacket = extractNode(packet)
-        sender = extranceSender(packet)
+        sender = extractSender(packet)
         self.checkNeighbors()
 
         node = existsInList(sender, self.tempNeighbors)
-        if node 
+        if node: 
             if isInPacket:
                 self.removeFromTemp(node)
                 self.addToBi(node)
@@ -131,7 +133,7 @@ class Node:
             return
 
         node = existsInList(sender, self.uniNeighbors)
-        if node 
+        if node: 
             if isInPacket:
                 self.removeFromUni(node)
                 self.addToUni(node)
@@ -160,7 +162,7 @@ class Node:
         if len(self.biNeighbors) == 3:
             return
         
-        selectList = set(range(6)) - getIdList(self.uniNeighbors)- getIdList(self.biNeighbors) - getIdList(self.tempNeighbors)) - set([self.id])
+        selectList = set(range(6)) - getIdList(self.uniNeighbors)- getIdList(self.biNeighbors) - getIdList(self.tempNeighbors) - set([self.id])
         if(len(selectList) != 0):
             newNode = random.choice(selectList)
             newNodeInfo = NodeInfo(nodes[newNode].ip,nodes[newNode].port, newNode)
