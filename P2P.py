@@ -6,17 +6,22 @@ import random
 import json
 from socket import *
 import os
+import ctypes 
+import ast
 
-ports = [20001,20002,20003,20004,20005,20006]
+ports = [20000,20001,20002,20003,20004,20005]
 nodes = []
 shouldExit = False
+
+TOTAL_TIME = 300
 
 
 class Logger:
     def __init__(self, fileName):
-        self.fileName = str(os.path.dirname(os.path.realpath(__file__))) + '/' + fileName
+        self.fileName = str(os.path.dirname(os.path.realpath(__file__))) + '/traces' + '/' + fileName
+        os.makedirs(os.path.dirname(self.fileName), exist_ok=True)
         try:
-            os.remove(fileName)
+            os.remove(self.fileName)
         except: 
             pass
     def log(self, msg):
@@ -55,6 +60,7 @@ class Node:
         self.t = threading.Thread(target=self.recv)
         self.t.start()
         self.s2 = schedule.every(2).seconds.do(runThread, self.manageSend)
+        self.logger.log('start')
 
     def createPacket(self):
         packet = {}
@@ -93,36 +99,36 @@ class Node:
 
 
     def recv(self):
+        global shouldExit
         while True:
+            if shouldExit:
+                print('end',self.id)
+                return
             if not self.state:
                 continue
-            global shouldExit
-            if shouldExit:
-                break
             data, address = self.sock.recvfrom(1024)
-            # print(data)
             data = data.decode()
             data = json.loads(data)
             self.processPacket(data)
 
     def addToUni(self, newNode):
         self.uniNeighbors.append(newNode)
-        self.logger.log('au' + ' ' + str(newNode.id) + ' ' + str(self.getIdList(self.uniNeighbors)))
+        self.logger.log('au' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.uniNeighbors))))
 
     def addToBi(self, newNode):
         if len(self.biNeighbors) < 3:
             self.biNeighbors.append(newNode)
-            self.logger.log('ab' + ' ' + str(newNode.id) + ' ' + str(self.getIdList(self.biNeighbors)))
+            self.logger.log('ab' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.biNeighbors))).replace(' ', ''))
 
     def addToTemp(self, newNode):
         self.tempNeighbors.append(newNode)
-        self.logger.log('at' + ' ' + str(newNode.id) + ' ' + str(self.getIdList(self.tempNeighbors)))
+        self.logger.log('at' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.tempNeighbors))).replace(' ', ''))
 
 
     def removeFromUni(self, node):
         try:
             self.uniNeighbors.remove(node)
-            self.logger.log('du' + ' ' + str(node.id) + ' ' + str(self.getIdList(self.uniNeighbors)))
+            self.logger.log('du' + ' ' + str(node.id) + ' ' + str(list(self.getIdList(self.uniNeighbors))).replace(' ', ''))
 
         except:
             print("There is no unidirectional neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
@@ -130,14 +136,14 @@ class Node:
     def removeFromBi(self, node):
         try:
             self.biNeighbors.remove(node)
-            self.logger.log('db' + ' ' + str(node.id) + ' ' + str(self.getIdList(self.biNeighbors)))
+            self.logger.log('db' + ' ' + str(node.id) + ' ' + str(list(self.getIdList(self.biNeighbors))).replace(' ', ''))
         except:
             print("There is no unidirectional neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
 
     def removeFromTemp(self, node):
         try:
             self.tempNeighbors.remove(node)
-            self.logger.log('dt' + ' ' + str(node.id) + ' ' + str(self.getIdList(self.tempNeighbors)))
+            self.logger.log('dt' + ' ' + str(node.id) + ' ' + str(list(self.getIdList(self.tempNeighbors))).replace(' ', ''))
         except:
             print("There is no unidirectional neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
 
@@ -171,7 +177,7 @@ class Node:
         isInPacket = self.isNodeInPacket(packet)
         sender = self.extractSender(packet)
         self.logger.log('r' + ' ' + str(self.ip) + ' ' + str(self.port) + ' ' + str(self.id) + ' ' + packet['ip'] + ' ' +
-                         str(packet['port']))
+                         str(packet['port']) + ' ' + str(packet['id']) + ' ' + str(isInPacket)) 
         self.checkNeighbors()
 
         node = self.existsInList(sender, self.tempNeighbors)
@@ -247,26 +253,117 @@ class Network:
         self.sleptNodes.append(newSleptNode)
         nodes[newSleptNode].state = False
         self.logger.log('s' + ' ' + str(self.sleptNodes[-1]))
-
-
+    
     def exit(self):
         print('prepare to exit')
         global shouldExit
         schedule.clear()
         shouldExit = True
-        for n in nodes:
-            n.t.join()
-            print('jonied ' + str(n.id))
+        # print('start joining')
+        # for n in nodes:
+        #     n.t.join()
+        #     print('jonied ' + str(n.id))
         print("end of execution")
 
     def run(self):
         print('start')
         for n in nodes:
             n.run()
-        timer = threading.Timer(60.0, self.exit) 
+        timer = threading.Timer(TOTAL_TIME, self.exit) 
         timer.start() 
 
 
+class Processor:
+    def __init__(self):
+        os.makedirs(os.path.dirname('./results/a.txt'), exist_ok=True)
+
+    def run(self):
+        for n in nodes:
+            data = []
+            filename = './traces/node' + str(n.id)
+            info = self.splitFile(filename)
+            data.append(self.getNeighborHistory(info))
+            data.append(self.getCurrNeighbors(info))
+            data.append(self.neighborsAvailability(info))
+            data.append(self.getTopology(info))
+            self.writeToFile('./results/Node-Port:'+str(n.port), data)
+
+    def splitFile(self,filename):
+        lines = []
+        file = open(filename, 'r')
+        line = file.readline()
+        while line:
+            lines.append(line.split())
+            line = file.readline()
+        return lines
+
+    def writeToFile(self, filename, data):
+        with open(filename, "w") as f:
+            f.write(json.dumps(data, indent=2))
+
+    def getNeighborHistory(self, info):
+        neighborsHistory = {}
+        for line in info:
+            if line[0] == 'r' and line[-3] == 'True':
+                if not line[5] in neighborsHistory:
+                    neighborsHistory[line[5]] = {'ip':line[4], 'port': line[5], 'id':line[6], 'sentPacketsNum': 0, 'recievedPacketsNum': 1}
+                else:
+                    neighborsHistory[line[5]]['recievedPacketsNum'] += 1
+            if line[0] == 's' and line[-3] == 'bi':
+                if not line[5] in neighborsHistory:
+                    neighborsHistory[line[5]] = {'ip':line[4], 'port': line[5], 'id':line[6], 'sentPacketsNum': 1, 'recievedPacketsNum': 0}
+                else:
+                    neighborsHistory[line[5]]['sentPacketsNum'] += 1
+        return {'Neighbors History' :list(neighborsHistory.values())}
+
+    def getCurrNeighbors(self, info):
+        currNeighbors = []
+        for i in range(len(info)-1,-1, -1):
+            line = info[i]
+            if line[0] == 'ab' or line[0] == 'db':
+                currNeighbors = ast.literal_eval(line[2])
+                break
+        return {'Current Neighbors':currNeighbors}     
+
+    def strToTime(self,string):
+        return datetime.strptime(string, '%H:%M:%S.%f')
+
+    def neighborsAvailability(self, info):
+        availability = {}
+        startTime = None
+        for line in info:
+            if line[0] == 'start':
+                startTime = self.strToTime(line[-1])
+            if line[0] == 'ab':
+                if not line[1] in availability:
+                    availability[line[1]] = {'id':int(line[1]), 'startTime': self.strToTime(line[-1]), 'availability':0}
+                else:
+                    availability[line[1]]['startTime'] = self.strToTime(line[-1])
+            if line[0] == 'db':
+                if not line[1] in availability or availability[line[1]]['startTime'] == None:
+                    print('error in availability. db before ab :||')
+                    print(line)
+                else:
+                    availability[line[1]]['availability'] += (self.strToTime(line[-1]) - availability[line[1]]['startTime']).total_seconds()
+                    availability[line[1]]['startTime'] = None
+        
+        for node in availability:
+            if availability[node]['startTime'] != None:
+                availability[node]['availability'] += TOTAL_TIME - (availability[node]['startTime'] - startTime).total_seconds()
+            availability[node]['availability'] = str(round(availability[node]['availability'] / TOTAL_TIME * 100, 2)) + '%'
+            del availability[node]['startTime']
+        return {'Neighbors Availability':list(availability.values())}
+
+
+    def getTopology(self, info):
+        topology = {}
+        for line in info:
+            if line[0] == 'ab':
+                topology[line[1]] = 'bidirectional'
+            if line[0] == 'au':
+                if not line[1] in topology:
+                    topology[line[1]] = 'unidirectional'
+        return {'Topology':topology}
 
 
 def runThread( jobFunc):
@@ -275,9 +372,14 @@ def runThread( jobFunc):
 
 network = Network()
 network.run()
-print("end of program")
 
 while not shouldExit:
     schedule.run_pending()
     time.sleep(1) 
-    
+        
+print("end of program")
+
+processor = Processor()
+processor.run()
+print('end')
+exit(0)

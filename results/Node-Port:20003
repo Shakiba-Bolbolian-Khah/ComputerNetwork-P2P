@@ -1,0 +1,81 @@
+[
+  {
+    "Neighbors History": [
+      {
+        "ip": "127.0.0.1",
+        "port": "20001",
+        "id": "1",
+        "sentPacketsNum": 14,
+        "recievedPacketsNum": 26
+      },
+      {
+        "ip": "127.0.0.1",
+        "port": "20002",
+        "id": "2",
+        "sentPacketsNum": 55,
+        "recievedPacketsNum": 43
+      },
+      {
+        "ip": "127.0.0.1",
+        "port": "20000",
+        "id": "0",
+        "sentPacketsNum": 47,
+        "recievedPacketsNum": 39
+      },
+      {
+        "ip": "127.0.0.1",
+        "port": "20005",
+        "id": "5",
+        "sentPacketsNum": 34,
+        "recievedPacketsNum": 46
+      },
+      {
+        "ip": "127.0.0.1",
+        "port": "20004",
+        "id": "4",
+        "sentPacketsNum": 2,
+        "recievedPacketsNum": 2
+      }
+    ]
+  },
+  {
+    "Current Neighbors": [
+      2,
+      4,
+      5
+    ]
+  },
+  {
+    "Neighbors Availability": [
+      {
+        "id": 2,
+        "availability": "64.34%"
+      },
+      {
+        "id": 0,
+        "availability": "50.65%"
+      },
+      {
+        "id": 5,
+        "availability": "34.54%"
+      },
+      {
+        "id": 1,
+        "availability": "11.03%"
+      },
+      {
+        "id": 4,
+        "availability": "1.65%"
+      }
+    ]
+  },
+  {
+    "Topology": {
+      "1": "bidirectional",
+      "5": "bidirectional",
+      "2": "bidirectional",
+      "0": "bidirectional",
+      "4": "bidirectional"
+    }
+  }
+]
