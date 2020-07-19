@@ -3,78 +3,78 @@
     "Neighbors History": [
       {
         "ip": "127.0.0.1",
-        "port": "20001",
-        "id": "1",
-        "sentPacketsNum": 60,
-        "recievedPacketsNum": 56
+        "port": "20003",
+        "id": "3",
+        "sentPacketsNum": 71,
+        "recievedPacketsNum": 68
       },
       {
         "ip": "127.0.0.1",
-        "port": "20003",
-        "id": "3",
-        "sentPacketsNum": 46,
-        "recievedPacketsNum": 55
+        "port": "20001",
+        "id": "1",
+        "sentPacketsNum": 74,
+        "recievedPacketsNum": 73
       },
       {
         "ip": "127.0.0.1",
         "port": "20000",
         "id": "0",
-        "sentPacketsNum": 49,
-        "recievedPacketsNum": 48
-      },
-      {
-        "ip": "127.0.0.1",
-        "port": "20005",
-        "id": "5",
-        "sentPacketsNum": 63,
-        "recievedPacketsNum": 72
+        "sentPacketsNum": 35,
+        "recievedPacketsNum": 38
       },
       {
         "ip": "127.0.0.1",
         "port": "20004",
         "id": "4",
-        "sentPacketsNum": 29,
-        "recievedPacketsNum": 20
+        "sentPacketsNum": 61,
+        "recievedPacketsNum": 63
+      },
+      {
+        "ip": "127.0.0.1",
+        "port": "20005",
+        "id": "5",
+        "sentPacketsNum": 68,
+        "recievedPacketsNum": 64
       }
     ]
   },
   {
     "Current Neighbors": [
-      3,
-      4,
-      5
+      0,
+      1,
+      3
     ]
   },
   {
     "Neighbors Availability": [
       {
+        "id": 3,
+        "availability": "62.31%"
+      },
+      {
         "id": 1,
-        "availability": "53.64%"
+        "availability": "66.12%"
       },
       {
         "id": 0,
-        "availability": "51.74%"
+        "availability": "27.17%"
       },
       {
         "id": 5,
-        "availability": "55.31%"
+        "availability": "61.12%"
       },
       {
         "id": 4,
-        "availability": "36.93%"
-      },
-      {
-        "id": 3,
-        "availability": "42.86%"
+        "availability": "61.52%"
       }
     ]
   },
   {
     "Topology": {
       "3": "bidirectional",
+      "4": "bidirectional",
       "1": "bidirectional",
       "0": "bidirectional",
-      "4": "bidirectional",
       "5": "bidirectional"
     }
   }

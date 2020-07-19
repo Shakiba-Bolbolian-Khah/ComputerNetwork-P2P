@@ -102,27 +102,39 @@ class Node:
         global shouldExit
         while True:
             if shouldExit:
-                print('end',self.id)
                 return
             if not self.state:
                 continue
-            data, address = self.sock.recvfrom(1024)
-            data = data.decode()
-            data = json.loads(data)
-            self.processPacket(data)
+            try: 
+                self.sock.settimeout(10)
+                data, address = self.sock.recvfrom(1024)
+                data = data.decode()
+                data = json.loads(data)
+                self.processPacket(data)
+            except timeout:
+                continue
+
+
+    def hasId(self, id,l):
+        for el in l:
+            if el.id == id:
+                return True
+        return False
 
     def addToUni(self, newNode):
-        self.uniNeighbors.append(newNode)
-        self.logger.log('au' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.uniNeighbors))))
+        if not self.hasId(newNode.id, self.uniNeighbors):
+            self.uniNeighbors.append(newNode)
+            self.logger.log('au' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.uniNeighbors))))
 
     def addToBi(self, newNode):
-        if len(self.biNeighbors) < 3:
+        if len(self.biNeighbors) < 3 and not self.hasId(newNode.id, self.biNeighbors):
             self.biNeighbors.append(newNode)
             self.logger.log('ab' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.biNeighbors))).replace(' ', ''))
 
     def addToTemp(self, newNode):
-        self.tempNeighbors.append(newNode)
-        self.logger.log('at' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.tempNeighbors))).replace(' ', ''))
+        if not self.hasId(newNode.id, self.tempNeighbors):
+            self.tempNeighbors.append(newNode)
+            self.logger.log('at' + ' ' + str(newNode.id) + ' ' + str(list(self.getIdList(self.tempNeighbors))).replace(' ', ''))
 
 
     def removeFromUni(self, node):
@@ -138,14 +150,14 @@ class Node:
             self.biNeighbors.remove(node)
             self.logger.log('db' + ' ' + str(node.id) + ' ' + str(list(self.getIdList(self.biNeighbors))).replace(' ', ''))
         except:
-            print("There is no unidirectional neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
+            print("There is no bidirectional neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
 
     def removeFromTemp(self, node):
         try:
             self.tempNeighbors.remove(node)
             self.logger.log('dt' + ' ' + str(node.id) + ' ' + str(list(self.getIdList(self.tempNeighbors))).replace(' ', ''))
         except:
-            print("There is no unidirectional neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
+            print("There is no temp neighbor with ip: ", node.ip, " in node with ip: ", self.ip)
 
     def checkNeighbors(self):
         for n in self.uniNeighbors + self.biNeighbors + self.tempNeighbors:
@@ -172,6 +184,8 @@ class Node:
 
     def processPacket(self, packet):
         if random.choice(range(100)) < 5: #implement packet loss manually =D
+            self.logger.log('d' + ' ' + str(self.ip) + ' ' + str(self.port) + ' ' + str(self.id) + ' ' + packet['ip'] + ' ' +
+                         str(packet['port']) + ' ' + str(packet['id']))
             return
 
         isInPacket = self.isNodeInPacket(packet)
@@ -259,10 +273,9 @@ class Network:
         global shouldExit
         schedule.clear()
         shouldExit = True
-        # print('start joining')
-        # for n in nodes:
-        #     n.t.join()
-        #     print('jonied ' + str(n.id))
+        print('start joining')
+        for n in nodes:
+            n.t.join()
         print("end of execution")
 
     def run(self):
@@ -278,6 +291,7 @@ class Processor:
         os.makedirs(os.path.dirname('./results/a.txt'), exist_ok=True)
 
     def run(self):
+        print('run processor')
         for n in nodes:
             data = []
             filename = './traces/node' + str(n.id)
@@ -382,4 +396,3 @@ print("end of program")
 processor = Processor()
 processor.run()
 print('end')
-exit(0)

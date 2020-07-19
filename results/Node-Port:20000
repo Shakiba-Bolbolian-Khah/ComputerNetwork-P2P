@@ -3,69 +3,68 @@
     "Neighbors History": [
       {
         "ip": "127.0.0.1",
-        "port": "20001",
-        "id": "1",
-        "sentPacketsNum": 14,
-        "recievedPacketsNum": 3
+        "port": "20004",
+        "id": "4",
+        "sentPacketsNum": 31,
+        "recievedPacketsNum": 23
       },
       {
         "ip": "127.0.0.1",
-        "port": "20004",
-        "id": "4",
-        "sentPacketsNum": 9,
-        "recievedPacketsNum": 27
+        "port": "20001",
+        "id": "1",
+        "sentPacketsNum": 13,
+        "recievedPacketsNum": 21
       },
       {
         "ip": "127.0.0.1",
         "port": "20003",
         "id": "3",
-        "sentPacketsNum": 40,
-        "recievedPacketsNum": 44
+        "sentPacketsNum": 53,
+        "recievedPacketsNum": 46
       },
       {
         "ip": "127.0.0.1",
         "port": "20002",
         "id": "2",
-        "sentPacketsNum": 50,
-        "recievedPacketsNum": 43
+        "sentPacketsNum": 43,
+        "recievedPacketsNum": 31
       },
       {
         "ip": "127.0.0.1",
         "port": "20005",
         "id": "5",
-        "sentPacketsNum": 45,
-        "recievedPacketsNum": 39
+        "sentPacketsNum": 24,
+        "recievedPacketsNum": 27
       }
     ]
   },
   {
     "Current Neighbors": [
       2,
-      4,
-      5
+      3
     ]
   },
   {
     "Neighbors Availability": [
       {
-        "id": 1,
-        "availability": "19.27%"
-      },
-      {
-        "id": 2,
-        "availability": "53.58%"
+        "id": 4,
+        "availability": "31.98%"
       },
       {
         "id": 3,
-        "availability": "44.99%"
+        "availability": "61.5%"
+      },
+      {
+        "id": 2,
+        "availability": "54.27%"
       },
       {
         "id": 5,
-        "availability": "71.91%"
+        "availability": "39.98%"
       },
       {
-        "id": 4,
-        "availability": "15.99%"
+        "id": 1,
+        "availability": "10.6%"
       }
     ]
   },
@@ -73,9 +72,9 @@
     "Topology": {
       "1": "bidirectional",
       "4": "bidirectional",
-      "2": "bidirectional",
       "3": "bidirectional",
-      "5": "bidirectional"
+      "5": "bidirectional",
+      "2": "bidirectional"
     }
   }
 ]

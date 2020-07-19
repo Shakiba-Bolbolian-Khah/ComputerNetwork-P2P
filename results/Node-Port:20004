@@ -5,67 +5,65 @@
         "ip": "127.0.0.1",
         "port": "20000",
         "id": "0",
-        "sentPacketsNum": 30,
-        "recievedPacketsNum": 9
+        "sentPacketsNum": 24,
+        "recievedPacketsNum": 29
       },
       {
         "ip": "127.0.0.1",
         "port": "20005",
         "id": "5",
-        "sentPacketsNum": 78,
-        "recievedPacketsNum": 78
-      },
-      {
-        "ip": "127.0.0.1",
-        "port": "20002",
-        "id": "2",
-        "sentPacketsNum": 22,
-        "recievedPacketsNum": 27
+        "sentPacketsNum": 74,
+        "recievedPacketsNum": 58
       },
       {
         "ip": "127.0.0.1",
         "port": "20001",
         "id": "1",
-        "sentPacketsNum": 43,
-        "recievedPacketsNum": 50
+        "sentPacketsNum": 20,
+        "recievedPacketsNum": 20
+      },
+      {
+        "ip": "127.0.0.1",
+        "port": "20002",
+        "id": "2",
+        "sentPacketsNum": 72,
+        "recievedPacketsNum": 57
       },
       {
         "ip": "127.0.0.1",
         "port": "20003",
         "id": "3",
-        "sentPacketsNum": 3,
-        "recievedPacketsNum": 2
+        "sentPacketsNum": 55,
+        "recievedPacketsNum": 50
       }
     ]
   },
   {
     "Current Neighbors": [
-      0,
-      2,
       5
     ]
   },
   {
     "Neighbors Availability": [
       {
-        "id": 0,
-        "availability": "32.23%"
-      },
-      {
         "id": 5,
-        "availability": "81.97%"
+        "availability": "77.47%"
       },
       {
         "id": 2,
-        "availability": "39.99%"
+        "availability": "63.73%"
       },
       {
         "id": 1,
-        "availability": "48.18%"
+        "availability": "16.29%"
       },
       {
         "id": 3,
-        "availability": "2.85%"
+        "availability": "64.57%"
+      },
+      {
+        "id": 0,
+        "availability": "26.44%"
       }
     ]
   },
@@ -73,8 +71,8 @@
     "Topology": {
       "0": "bidirectional",
       "5": "bidirectional",
-      "3": "bidirectional",
       "2": "bidirectional",
+      "3": "bidirectional",
       "1": "bidirectional"
     }
   }
